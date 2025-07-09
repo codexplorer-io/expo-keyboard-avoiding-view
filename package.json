@@ -4,6 +4,7 @@
   "main": "src/index.js",
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-keyboard-controller": "*"
   }
 }
