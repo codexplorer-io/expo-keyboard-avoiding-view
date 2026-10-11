@@ -10,20 +10,21 @@ description: Instructions for using @codexporer.io/expo-keyboard-avoiding-view f
 
 ---
 
+## When to Use
+- Wrapping form screens with text inputs to prevent the virtual keyboard from obscuring fields.
+- Pinning sticky buttons or footers directly above the soft keyboard.
+- Handling keyboard avoidance inside native modal dialogs.
+
+---
+
 ## Prerequisites
 Ensure `<KeyboardProvider>` from `react-native-keyboard-controller` is mounted at the app root (e.g. in `_layout.tsx` or `App.tsx`).
 
 ---
 
-## Core Component Export
+## API Reference
 
-```tsx
-import { KeyboardAvoidingView } from '@codexporer.io/expo-keyboard-avoiding-view';
-```
-
----
-
-## Props Interface
+### `<KeyboardAvoidingView />` Props
 
 | Prop | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
@@ -105,7 +106,7 @@ export function EditModal({ visible, onClose }: { visible: boolean; onClose: () 
 
 ---
 
-## Implementation Rules
+## Critical Rules & Guidelines
 1. **Forms with Scroll View**: Always pass `hasScroll={true}` when wrapping long forms or screens containing multiline text inputs.
 2. **Sticky Footers**: Pass `isSticky={true}` when action buttons should stick directly above the soft keyboard.
 3. **Modal Screens**: Always pass `isInModal={true}` when wrapping content inside a React Native `<Modal>`.
