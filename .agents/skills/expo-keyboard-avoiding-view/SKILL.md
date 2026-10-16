@@ -10,6 +10,16 @@ description: Instructions for using @codexporer.io/expo-keyboard-avoiding-view f
 
 ---
 
+## Peer Dependencies
+
+All 4 peer dependencies are required and must be installed in consuming projects (none are optional):
+- `react`: `*`
+- `react-native`: `*`
+- `react-native-keyboard-controller`: `*`
+- `react-native-safe-area-context`: `*`
+
+---
+
 ## When to Use
 - Wrapping form screens with text inputs to prevent the virtual keyboard from obscuring fields.
 - Pinning sticky buttons or footers directly above the soft keyboard.
@@ -17,23 +27,32 @@ description: Instructions for using @codexporer.io/expo-keyboard-avoiding-view f
 
 ---
 
-## Prerequisites
-Ensure `<KeyboardProvider>` from `react-native-keyboard-controller` is mounted at the app root (e.g. in `_layout.tsx` or `App.tsx`).
+## Prerequisites in Component Tree
+Consuming applications must mount both providers at the root of their component tree (e.g. in `_layout.tsx` or `App.tsx`):
+- `<SafeAreaProvider>` from `react-native-safe-area-context`
+- `<KeyboardProvider>` from `react-native-keyboard-controller`
 
 ---
 
 ## API Reference
 
-### `<KeyboardAvoidingView />` Props
+### `<KeyboardAvoidingView />` Component Selection
+
+The component dynamically renders one of three underlying views:
+1. `isInModal={true}`: Renders React Native's `<KeyboardAvoidingView>` (`RNKeyboardAvoidingView`) with `behavior={Platform.OS === 'ios' ? 'padding' : 'height'}`.
+2. `isSticky={true}`: Renders `<KeyboardStickyView>` from `react-native-keyboard-controller`. Applies `extraKeyboardSpace={-insets.bottom}`.
+3. `hasScroll={true}`: Renders `<KeyboardAwareScrollView>` from `react-native-keyboard-controller`. Applies `extraKeyboardSpace={-insets.bottom}`.
+4. Default: Renders `<KeyboardAvoidingView>` from `react-native-keyboard-controller` with `behavior={Platform.OS === 'ios' ? 'padding' : 'height'}` and `extraKeyboardSpace={-insets.bottom}`.
+
+### Props
 
 | Prop | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `hasScroll` | `boolean` | `false` | Set to `true` to render a keyboard-aware scroll container (`KeyboardAwareScrollView`). |
 | `isSticky` | `boolean` | `false` | Set to `true` for sticky footer view elements (`KeyboardStickyView`). |
 | `isInModal` | `boolean` | `false` | Set to `true` inside modal dialogs to use native React Native `KeyboardAvoidingView`. |
-| `offset` | `number` | `0` | Additional vertical offset to apply above the keyboard. |
-| `children` | `ReactNode` | — | Component children. |
-| `style` | `StyleProp<ViewStyle>` | — | Container style. |
+| `children` | `React.ReactNode` | — | Component children. |
+| `...props` | `any` | — | Additional props forwarded directly to the underlying container component. |
 
 ---
 
@@ -68,15 +87,14 @@ const styles = StyleSheet.create({
 
 ```tsx
 import React from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Button } from 'react-native';
 import { KeyboardAvoidingView } from '@codexporer.io/expo-keyboard-avoiding-view';
-import { Button } from '@codexporer.io/expo-button';
 
 export function CheckoutScreen() {
   return (
     <View style={{ flex: 1 }}>
       <TextInput placeholder="Promo code" />
-      <KeyboardAvoidingView isSticky offset={16}>
+      <KeyboardAvoidingView isSticky>
         <Button title="Submit" onPress={() => console.log('Submit')} />
       </KeyboardAvoidingView>
     </View>
@@ -110,4 +128,6 @@ export function EditModal({ visible, onClose }: { visible: boolean; onClose: () 
 1. **Forms with Scroll View**: Always pass `hasScroll={true}` when wrapping long forms or screens containing multiline text inputs.
 2. **Sticky Footers**: Pass `isSticky={true}` when action buttons should stick directly above the soft keyboard.
 3. **Modal Screens**: Always pass `isInModal={true}` when wrapping content inside a React Native `<Modal>`.
-4. **Avoid Manual Offset Calculations**: Do NOT manually calculate keyboard offsets or padding; safe area bottom insets are automatically handled.
+4. **Avoid Manual Offset Calculations**: Do NOT manually calculate keyboard offsets or safe area bottom padding; safe area bottom insets are automatically subtracted (`extraKeyboardSpace={-insets.bottom}`).
+5. **All 4 Peer Dependencies Required**: Consuming applications must install all 4 peer dependencies without marking any as optional.
+
